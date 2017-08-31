@@ -269,7 +269,10 @@ export default class Autosuggest extends Component {
       event.target;
 
     while (node !== null && node !== document) {
-      if (node.getAttribute('data-suggestion-index') !== null) {
+      if (
+        node.getAttribute &&
+        node.getAttribute('data-suggestion-index') !== null
+      ) {
         // Suggestion was clicked
         return;
       }
@@ -288,7 +291,10 @@ export default class Autosuggest extends Component {
     let node = startNode;
 
     do {
-      if (node.getAttribute('data-suggestion-index') !== null) {
+      if (
+        node.getAttribute &&
+        node.getAttribute('data-suggestion-index') !== null
+      ) {
         return node;
       }
 
