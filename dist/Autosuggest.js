@@ -524,9 +524,9 @@ var Autosuggest = (function(_Component) {
                     newValue,
                     keyCode === 40 ? 'down' : 'up'
                   );
-                }
 
-                event.preventDefault(); // Prevents the cursor from moving
+                  event.preventDefault(); // Prevents the cursor from moving
+                }
 
                 _this2.justPressedUpDown = true;
 
