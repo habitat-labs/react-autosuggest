@@ -152,16 +152,8 @@ var Autosuggest = (function(_Component) {
       key: 'componentWillReceiveProps',
       value: function componentWillReceiveProps(nextProps) {
         if (
-          (0, _arrays2.default)(nextProps.suggestions, this.props.suggestions)
+          !(0, _arrays2.default)(nextProps.suggestions, this.props.suggestions)
         ) {
-          if (
-            nextProps.highlightFirstSuggestion &&
-            nextProps.suggestions.length > 0 &&
-            this.justPressedUpDown === false
-          ) {
-            this.highlightFirstSuggestion();
-          }
-        } else {
           if (this.willRenderSuggestions(nextProps)) {
             if (nextProps.highlightFirstSuggestion) {
               this.highlightFirstSuggestion();
