@@ -117,15 +117,7 @@ export default class Autosuggest extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (shallowEqualArrays(nextProps.suggestions, this.props.suggestions)) {
-      if (
-        nextProps.highlightFirstSuggestion &&
-        nextProps.suggestions.length > 0 &&
-        this.justPressedUpDown === false
-      ) {
-        this.highlightFirstSuggestion();
-      }
-    } else {
+    if (!shallowEqualArrays(nextProps.suggestions, this.props.suggestions)) {
       if (this.willRenderSuggestions(nextProps)) {
         if (nextProps.highlightFirstSuggestion) {
           this.highlightFirstSuggestion();
