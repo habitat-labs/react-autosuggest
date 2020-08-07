@@ -148,6 +148,8 @@ export default class Autosuggest extends Component {
       if (this.willRenderSuggestions(nextProps, REASON_SUGGESTIONS_UPDATED)) {
         if (this.state.isCollapsed && !this.justSelectedSuggestion) {
           this.revealSuggestions();
+        } else if (!nextProps.highlightFirstSuggestion) {
+          this.resetHighlightedSuggestion();
         }
         if (
           this.state.highlightedSuggestionIndex === 0 &&
