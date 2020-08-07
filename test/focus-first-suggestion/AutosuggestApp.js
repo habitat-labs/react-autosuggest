@@ -13,15 +13,15 @@ const getMatchingLanguages = (value) => {
 
 let app = null;
 
+export const getSuggestionValue = sinon.spy((suggestion) => {
+  return suggestion.name;
+});
+
 export const getHighlightFirstSuggestion = sinon.spy(
   (highlightFirstSuggestion, value) => {
     return Boolean(highlightFirstSuggestion && value);
   }
 );
-
-export const getSuggestionValue = sinon.spy((suggestion) => {
-  return suggestion.name;
-});
 
 export const renderSuggestion = sinon.spy((suggestion) => {
   return <span>{suggestion.name}</span>;
