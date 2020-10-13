@@ -137,7 +137,7 @@ export default class Autosuggest extends Component {
         this.highlightFirstSuggestion();
       }
     } else {
-      if (this.willRenderSuggestions(nextProps)) {
+      if (this.willRenderSuggestions(nextProps, 'suggestions-updated')) {
         if (this.state.isCollapsed && !this.justSelectedSuggestion) {
           this.revealSuggestions();
         }
@@ -332,11 +332,11 @@ export default class Autosuggest extends Component {
     }
   }
 
-  willRenderSuggestions(props) {
+  willRenderSuggestions(props, reason) {
     const { suggestions, inputProps, shouldRenderSuggestions } = props;
     const { value } = inputProps;
 
-    return suggestions.length > 0 && shouldRenderSuggestions(value);
+    return suggestions.length > 0 && shouldRenderSuggestions(value, reason);
   }
 
   storeAutowhateverRef = (autowhatever) => {
@@ -444,7 +444,7 @@ export default class Autosuggest extends Component {
     const { inputProps, shouldRenderSuggestions } = this.props;
     const { value, onBlur } = inputProps;
     const highlightedSuggestion = this.getHighlightedSuggestion();
-    const shouldRender = shouldRenderSuggestions(value);
+    const shouldRender = shouldRenderSuggestions(value, 'input-blurred');
 
     this.setState({
       isFocused: false,
@@ -539,7 +539,7 @@ export default class Autosuggest extends Component {
       ? alwaysTrue
       : this.props.shouldRenderSuggestions;
     const { value, onFocus, onKeyDown } = inputProps;
-    const willRenderSuggestions = this.willRenderSuggestions(this.props);
+    const willRenderSuggestions = this.willRenderSuggestions(this.props, 'render');
     const isOpen =
       alwaysRenderSuggestions ||
       (isFocused && !isCollapsed && willRenderSuggestions);
@@ -551,7 +551,7 @@ export default class Autosuggest extends Component {
           !this.justSelectedSuggestion &&
           !this.justClickedOnSuggestionsContainer
         ) {
-          const shouldRender = shouldRenderSuggestions(value);
+          const shouldRender = shouldRenderSuggestions(value, 'input-focused');
 
           this.setState({
             isFocused: true,
@@ -580,7 +580,7 @@ export default class Autosuggest extends Component {
       },
       onChange: (event) => {
         const { value } = event.target;
-        const shouldRender = shouldRenderSuggestions(value);
+        const shouldRender = shouldRenderSuggestions(value, 'input-changed');
 
         this.maybeCallOnChange(event, value, 'type');
 
@@ -613,7 +613,7 @@ export default class Autosuggest extends Component {
           case 40: // ArrowDown
           case 38: // ArrowUp
             if (isCollapsed) {
-              if (shouldRenderSuggestions(value)) {
+              if (shouldRenderSuggestions(value, 'suggestions-revealed')) {
                 onSuggestionsFetchRequested({
                   value,
                   reason: 'suggestions-revealed',
@@ -720,7 +720,7 @@ export default class Autosuggest extends Component {
 
                 this.maybeCallOnChange(event, newValue, 'escape');
 
-                if (shouldRenderSuggestions(newValue)) {
+                if (shouldRenderSuggestions(newValue, 'escape-pressed')) {
                   onSuggestionsFetchRequested({
                     value: newValue,
                     reason: 'escape-pressed',
