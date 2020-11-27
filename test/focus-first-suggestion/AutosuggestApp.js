@@ -13,15 +13,11 @@ const getMatchingLanguages = (value) => {
 
 let app = null;
 
-export const getSuggestionValue = sinon.spy((suggestion) => {
-  return suggestion.name;
-});
-
-export const getHighlightFirstSuggestion = sinon.spy(
-  (highlightFirstSuggestion, value) => {
-    return Boolean(highlightFirstSuggestion && value);
-  }
-);
+export const setHighlightFirstSuggestion = (value) => {
+  app.setState({
+    highlightFirstSuggestion: value
+  });
+};
 
 export const renderSuggestion = sinon.spy((suggestion) => {
   return <span>{suggestion.name}</span>;
@@ -63,11 +59,12 @@ export default class AutosuggestApp extends Component {
       value: '',
       suggestions: [],
       highlightedSuggestion: null,
+      highlightFirstSuggestion: false
     };
   }
 
   render() {
-    const { value, suggestions } = this.state;
+    const { value, suggestions, highlightFirstSuggestion } = this.state;
     const inputProps = {
       value,
       onChange,
@@ -83,7 +80,7 @@ export default class AutosuggestApp extends Component {
         getSuggestionValue={getSuggestionValue}
         renderSuggestion={renderSuggestion}
         inputProps={inputProps}
-        highlightFirstSuggestion={getHighlightFirstSuggestion}
+        highlightFirstSuggestion={highlightFirstSuggestion}
       />
     );
   }
