@@ -15,9 +15,13 @@ let app = null;
 
 export const setHighlightFirstSuggestion = (value) => {
   app.setState({
-    highlightFirstSuggestion: value
+    highlightFirstSuggestion: value,
   });
 };
+
+export const getSuggestionValue = sinon.spy((suggestion) => {
+  return suggestion.name;
+});
 
 export const renderSuggestion = sinon.spy((suggestion) => {
   return <span>{suggestion.name}</span>;
@@ -59,7 +63,7 @@ export default class AutosuggestApp extends Component {
       value: '',
       suggestions: [],
       highlightedSuggestion: null,
-      highlightFirstSuggestion: false
+      highlightFirstSuggestion: false,
     };
   }
 
