@@ -146,18 +146,7 @@ export default class Autosuggest extends Component {
       this.props.highlightFirstSuggestion &&
       !nextProps.highlightFirstSuggestion;
 
-    if (shallowEqualArrays(nextProps.suggestions, this.props.suggestions)) {
-      if (
-        nextProps.highlightFirstSuggestion &&
-        nextProps.suggestions.length > 0 &&
-        this.justPressedUpDown === false &&
-        this.justMouseEntered === false
-      ) {
-        this.highlightFirstSuggestion();
-      } else if (shouldResetHighlighting) {
-        this.resetHighlightedSuggestion();
-      }
-    } else {
+    if (!shallowEqualArrays(nextProps.suggestions, this.props.suggestions)) {
       if (this.willRenderSuggestions(nextProps, REASON_SUGGESTIONS_UPDATED)) {
         if (this.state.isCollapsed && !this.justSelectedSuggestion) {
           this.revealSuggestions();
@@ -167,6 +156,15 @@ export default class Autosuggest extends Component {
           this.resetHighlightedSuggestion();
         }
       } else {
+        this.resetHighlightedSuggestion();
+      }
+    } else {
+      if (
+        nextProps.highlightFirstSuggestion &&
+        !this.props.highlightFirstSuggestion
+      ) {
+        this.highlightFirstSuggestion();
+      } else if (shouldResetHighlighting) {
         this.resetHighlightedSuggestion();
       }
     }
