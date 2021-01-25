@@ -57,10 +57,7 @@ export default class Autosuggest extends Component {
     renderSectionTitle: (props, propName) => {
       const renderSectionTitle = props[propName];
 
-      if (
-        props.multiSection === true &&
-        typeof renderSectionTitle !== 'function'
-      ) {
+      if (props.multiSection === true && typeof renderSectionTitle !== 'function') {
         throw new Error(
           "'renderSectionTitle' must be implemented. See: https://github.com/moroshko/react-autosuggest#renderSectionTitleProp"
         );
@@ -69,10 +66,7 @@ export default class Autosuggest extends Component {
     getSectionSuggestions: (props, propName) => {
       const getSectionSuggestions = props[propName];
 
-      if (
-        props.multiSection === true &&
-        typeof getSectionSuggestions !== 'function'
-      ) {
+      if (props.multiSection === true && typeof getSectionSuggestions !== 'function') {
         throw new Error(
           "'getSectionSuggestions' must be implemented. See: https://github.com/moroshko/react-autosuggest#getSectionSuggestionsProp"
         );
@@ -117,33 +111,36 @@ export default class Autosuggest extends Component {
     this.suggestionsContainer = this.autowhatever.itemsContainer;
   }
 
-  componentWillReceiveProps(nextProps) {
+  // eslint-disable-next-line camelcase, react/sort-comp
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    // When highlightFirstSuggestion becomes deactivated, if the first suggestion was
+    // set, we should reset the suggestion back to the unselected default state.
+    const shouldResetHighlighting =
+      this.state.highlightedSuggestionIndex === 0 &&
+      this.props.highlightFirstSuggestion &&
+      !nextProps.highlightFirstSuggestion;
+
     if (!shallowEqualArrays(nextProps.suggestions, this.props.suggestions)) {
-      if (this.willRenderSuggestions(nextProps)) {
+      if (this.willRenderSuggestions(nextProps, REASON_SUGGESTIONS_UPDATED)) {
         if (this.state.isCollapsed && !this.justSelectedSuggestion) {
           this.revealSuggestions();
-        } else if (!nextProps.highlightFirstSuggestion) {
-          this.resetHighlightedSuggestion();
         }
-        if (
-          this.state.highlightedSuggestionIndex === 0 &&
-          this.props.highlightFirstSuggestion &&
-          !nextProps.highlightFirstSuggestion
-        ) {
+
+        if (shouldResetHighlighting) {
           this.resetHighlightedSuggestion();
         }
       } else {
+        this.resetHighlightedSuggestion();
+      }
+    } else {
+      if (shouldResetHighlighting) {
         this.resetHighlightedSuggestion();
       }
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const {
-      suggestions,
-      onSuggestionHighlighted,
-      highlightFirstSuggestion
-    } = this.props;
+    const { suggestions, onSuggestionHighlighted, highlightFirstSuggestion } = this.props;
 
     if (
       !shallowEqualArrays(suggestions, prevProps.suggestions) &&
@@ -176,10 +173,7 @@ export default class Autosuggest extends Component {
 
       if (suggestionIndex === null) {
         valueBeforeUpDown = null;
-      } else if (
-        valueBeforeUpDown === null &&
-        typeof prevValue !== 'undefined'
-      ) {
+      } else if (valueBeforeUpDown === null && typeof prevValue !== 'undefined') {
         valueBeforeUpDown = prevValue;
       }
 
@@ -187,9 +181,7 @@ export default class Autosuggest extends Component {
         highlightedSectionIndex: sectionIndex,
         highlightedSuggestionIndex: suggestionIndex,
         highlightedSuggestion:
-          suggestionIndex === null
-            ? null
-            : this.getSuggestion(sectionIndex, suggestionIndex),
+          suggestionIndex === null ? null : this.getSuggestion(sectionIndex, suggestionIndex),
         valueBeforeUpDown
       };
     });
@@ -203,9 +195,7 @@ export default class Autosuggest extends Component {
         highlightedSectionIndex: null,
         highlightedSuggestionIndex: null,
         highlightedSuggestion: null,
-        valueBeforeUpDown: shouldResetValueBeforeUpDown
-          ? null
-          : valueBeforeUpDown
+        valueBeforeUpDown: shouldResetValueBeforeUpDown ? null : valueBeforeUpDown
       };
     });
   }
@@ -243,29 +233,21 @@ export default class Autosuggest extends Component {
       return null;
     }
 
-    return this.getSuggestion(
-      highlightedSectionIndex,
-      highlightedSuggestionIndex
-    );
+    return this.getSuggestion(highlightedSectionIndex, highlightedSuggestionIndex);
   }
 
   getSuggestionValueByIndex(sectionIndex, suggestionIndex) {
     const { getSuggestionValue } = this.props;
 
-    return getSuggestionValue(
-      this.getSuggestion(sectionIndex, suggestionIndex)
-    );
+    return getSuggestionValue(this.getSuggestion(sectionIndex, suggestionIndex));
   }
 
   getSuggestionIndices(suggestionElement) {
     const sectionIndex = suggestionElement.getAttribute('data-section-index');
-    const suggestionIndex = suggestionElement.getAttribute(
-      'data-suggestion-index'
-    );
+    const suggestionIndex = suggestionElement.getAttribute('data-suggestion-index');
 
     return {
-      sectionIndex:
-        typeof sectionIndex === 'string' ? parseInt(sectionIndex, 10) : null,
+      sectionIndex: typeof sectionIndex === 'string' ? parseInt(sectionIndex, 10) : null,
       suggestionIndex: parseInt(suggestionIndex, 10)
     };
   }
@@ -278,10 +260,7 @@ export default class Autosuggest extends Component {
       event.target;
 
     while (node !== null && node !== document) {
-      if (
-        node.getAttribute &&
-        node.getAttribute('data-suggestion-index') !== null
-      ) {
+      if (node.getAttribute && node.getAttribute('data-suggestion-index') !== null) {
         // Suggestion was clicked
         return;
       }
@@ -300,10 +279,7 @@ export default class Autosuggest extends Component {
     let node = startNode;
 
     do {
-      if (
-        node.getAttribute &&
-        node.getAttribute('data-suggestion-index') !== null
-      ) {
+      if (node.getAttribute && node.getAttribute('data-suggestion-index') !== null) {
         return node;
       }
 
@@ -380,9 +356,7 @@ export default class Autosuggest extends Component {
       this.findSuggestionElement(event.target)
     );
     const clickedSuggestion = this.getSuggestion(sectionIndex, suggestionIndex);
-    const clickedSuggestionValue = this.props.getSuggestionValue(
-      clickedSuggestion
-    );
+    const clickedSuggestionValue = this.props.getSuggestionValue(clickedSuggestion);
 
     this.maybeCallOnChange(event, clickedSuggestionValue, 'click');
     this.onSuggestionSelected(event, {
@@ -488,17 +462,12 @@ export default class Autosuggest extends Component {
       : this.props.shouldRenderSuggestions;
     const { value, onFocus, onKeyDown } = inputProps;
     const willRenderSuggestions = this.willRenderSuggestions(this.props);
-    const isOpen =
-      alwaysRenderSuggestions ||
-      (isFocused && !isCollapsed && willRenderSuggestions);
+    const isOpen = alwaysRenderSuggestions || (isFocused && !isCollapsed && willRenderSuggestions);
     const items = isOpen ? suggestions : [];
     const autowhateverInputProps = {
       ...inputProps,
       onFocus: event => {
-        if (
-          !this.justSelectedSuggestion &&
-          !this.justClickedOnSuggestionsContainer
-        ) {
+        if (!this.justSelectedSuggestion && !this.justClickedOnSuggestionsContainer) {
           const shouldRender = shouldRenderSuggestions(value);
 
           this.setState({
@@ -569,10 +538,7 @@ export default class Autosuggest extends Component {
                 this.revealSuggestions();
               }
             } else if (suggestions.length > 0) {
-              const {
-                newHighlightedSectionIndex,
-                newHighlightedItemIndex
-              } = data;
+              const { newHighlightedSectionIndex, newHighlightedItemIndex } = data;
 
               let newValue;
 
@@ -580,8 +546,7 @@ export default class Autosuggest extends Component {
                 // valueBeforeUpDown can be null if, for example, user
                 // hovers on the first suggestion and then pressed Up.
                 // If that happens, use the original input value.
-                newValue =
-                  valueBeforeUpDown === null ? value : valueBeforeUpDown;
+                newValue = valueBeforeUpDown === null ? value : valueBeforeUpDown;
               } else {
                 newValue = this.getSuggestionValueByIndex(
                   newHighlightedSectionIndex,
@@ -594,11 +559,7 @@ export default class Autosuggest extends Component {
                 newHighlightedItemIndex,
                 value
               );
-              this.maybeCallOnChange(
-                event,
-                newValue,
-                keyCode === 40 ? 'down' : 'up'
-              );
+              this.maybeCallOnChange(event, newValue, keyCode === 40 ? 'down' : 'up');
 
               event.preventDefault(); // Prevents the cursor from moving
             }
