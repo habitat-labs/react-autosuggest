@@ -15,17 +15,50 @@ import {
   clickEnter,
   clickDown,
   setInputValue,
-  focusAndSetInputValue
+  focusAndSetInputValue,
 } from '../helpers';
 import AutosuggestApp, {
   onChange,
   onSuggestionSelected,
-  onSuggestionHighlighted
+  onSuggestionHighlighted,
+  setHighlightFirstSuggestion,
 } from './AutosuggestApp';
 
 describe('Autosuggest with highlightFirstSuggestion={true}', () => {
   beforeEach(() => {
     init(TestUtils.renderIntoDocument(<AutosuggestApp />));
+    setHighlightFirstSuggestion(true);
+  });
+
+  describe('when highlightFirstSuggestion changes from true to false', () => {
+    it("should unhighlight the suggestion", () => {
+      focusAndSetInputValue('j');
+      expectHighlightedSuggestion('Java');
+
+      setHighlightFirstSuggestion(false);
+      expectHighlightedSuggestion(null);
+    });
+
+    it("should retain the selected suggestion if it was set manually", () => {
+      focusAndSetInputValue('j');
+      expectHighlightedSuggestion('Java');
+      clickDown();
+      expectHighlightedSuggestion('JavaScript');
+
+      setHighlightFirstSuggestion(false);
+      expectHighlightedSuggestion('JavaScript');
+    });
+
+    it("should re-highlight the suggestion if it becomes true again", () => {
+      focusAndSetInputValue('j');
+      expectHighlightedSuggestion('Java');
+
+      setHighlightFirstSuggestion(false);
+      expectHighlightedSuggestion(null);
+
+      setHighlightFirstSuggestion(true);
+      expectHighlightedSuggestion('Java');
+    });
   });
 
   describe('when typing and matches exist', () => {
@@ -112,12 +145,12 @@ describe('Autosuggest with highlightFirstSuggestion={true}', () => {
   describe('inputProps.onChange', () => {
     it('should be called once with the right parameters when Enter is pressed after autohighlight', () => {
       focusAndSetInputValue('p');
-      onChange.reset();
+      onChange.resetHistory();
       clickEnter();
       expect(onChange).to.have.been.calledOnce;
       expect(onChange).to.be.calledWith(syntheticEventMatcher, {
         newValue: 'Perl',
-        method: 'enter'
+        method: 'enter',
       });
     });
   });
@@ -125,28 +158,39 @@ describe('Autosuggest with highlightFirstSuggestion={true}', () => {
   describe('onSuggestionSelected', () => {
     it('should be called once with the right parameters when Enter is pressed after autohighlight', () => {
       focusAndSetInputValue('p');
-      onSuggestionSelected.reset();
+      onSuggestionSelected.resetHistory();
       clickEnter();
       expect(onSuggestionSelected).to.have.been.calledOnce;
-      expect(
-        onSuggestionSelected
-      ).to.have.been.calledWithExactly(syntheticEventMatcher, {
-        suggestion: { name: 'Perl', year: 1987 },
-        suggestionValue: 'Perl',
-        suggestionIndex: 0,
-        sectionIndex: null,
-        method: 'enter'
-      });
+      expect(onSuggestionSelected).to.have.been.calledWithExactly(
+        syntheticEventMatcher,
+        {
+          suggestion: { name: 'Perl', year: 1987 },
+          suggestionValue: 'Perl',
+          suggestionIndex: 0,
+          sectionIndex: null,
+          method: 'enter',
+        }
+      );
     });
   });
 
   describe('onSuggestionHighlighted', () => {
     it('should be called once with the highlighed suggestion when the first suggestion is autohighlighted', () => {
-      onSuggestionHighlighted.reset();
+      onSuggestionHighlighted.resetHistory();
       focusAndSetInputValue('p');
       expect(onSuggestionHighlighted).to.have.been.calledOnce;
       expect(onSuggestionHighlighted).to.have.been.calledWithExactly({
-        suggestion: { name: 'Perl', year: 1987 }
+        suggestion: { name: 'Perl', year: 1987 },
+      });
+    });
+
+    it('should be called once with the new suggestion when typing more changes the autohighlighted suggestion', () => {
+      focusAndSetInputValue('c');
+      onSuggestionHighlighted.resetHistory();
+      focusAndSetInputValue('c+');
+      expect(onSuggestionHighlighted).to.have.been.calledOnce;
+      expect(onSuggestionHighlighted).to.have.been.calledWithExactly({
+        suggestion: { name: 'C++', year: 1983 },
       });
     });
   });

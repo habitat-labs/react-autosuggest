@@ -24,6 +24,7 @@ import {
   clickClearButton
 } from '../helpers';
 import AutosuggestApp, {
+  renderSuggestion,
   onSuggestionsFetchRequested,
   onSuggestionSelected,
   onSuggestionHighlighted,
@@ -35,6 +36,35 @@ import AutosuggestApp, {
 describe('Autosuggest with multiSection={true}', () => {
   beforeEach(() => {
     init(TestUtils.renderIntoDocument(<AutosuggestApp />));
+  });
+
+  describe('renderSuggestion', () => {
+    beforeEach(() => {
+      focusInput();
+    });
+
+    it('should be called once for every suggestion', () => {
+      expect(renderSuggestion).to.have.callCount(14);
+    });
+
+    it('should be called with an empty query when input field is blank', () => {
+      renderSuggestion.resetHistory();
+      clickDown();
+      expect(renderSuggestion.getCall(0).args).to.deep.equal([
+        { name: 'C', year: 1972 },
+        { query: '', isHighlighted: true }
+      ]);
+    });
+
+    it('should trim the value before passing it to the query', () => {
+      renderSuggestion.resetHistory();
+      setInputValue(' ');
+      clickDown();
+      expect(renderSuggestion.getCall(0).args).to.deep.equal([
+        { name: 'C', year: 1972 },
+        { query: '', isHighlighted: true }
+      ]);
+    });
   });
 
   describe('shouldRenderSuggestions', () => {
@@ -61,7 +91,7 @@ describe('Autosuggest with multiSection={true}', () => {
 
   describe('onSuggestionSelected', () => {
     beforeEach(() => {
-      onSuggestionSelected.reset();
+      onSuggestionSelected.resetHistory();
       focusInput();
     });
 
@@ -90,7 +120,7 @@ describe('Autosuggest with multiSection={true}', () => {
   describe('onSuggestionHighlighted', () => {
     it('should be called once with the suggestion that becomes highlighted', () => {
       focusAndSetInputValue('c');
-      onSuggestionHighlighted.reset();
+      onSuggestionHighlighted.resetHistory();
       clickDown();
       expect(onSuggestionHighlighted).to.have.been.calledOnce;
       expect(onSuggestionHighlighted).to.have.been.calledWithExactly({
@@ -101,7 +131,7 @@ describe('Autosuggest with multiSection={true}', () => {
     it('should be called once with null when there is no more highlighted suggestion', () => {
       focusAndSetInputValue('c');
       clickDown();
-      onSuggestionHighlighted.reset();
+      onSuggestionHighlighted.resetHistory();
       clickUp();
       expect(onSuggestionHighlighted).to.have.been.calledOnce;
       expect(onSuggestionHighlighted).to.have.been.calledWithExactly({
@@ -112,7 +142,7 @@ describe('Autosuggest with multiSection={true}', () => {
 
   describe('onSuggestionsFetchRequested', () => {
     it('should be called once with the right parameters when input gets focus and shouldRenderSuggestions returns true', () => {
-      onSuggestionsFetchRequested.reset();
+      onSuggestionsFetchRequested.resetHistory();
       focusInput();
       expect(onSuggestionsFetchRequested).to.have.been.calledOnce;
       expect(onSuggestionsFetchRequested).to.have.been.calledWithExactly({
@@ -123,7 +153,7 @@ describe('Autosuggest with multiSection={true}', () => {
 
     it('should be called once with the right parameters when Escape is pressed and suggestions are hidden and shouldRenderSuggestions returns true for empty value', () => {
       focusAndSetInputValue('jr');
-      onSuggestionsFetchRequested.reset();
+      onSuggestionsFetchRequested.resetHistory();
       clickEscape();
       expect(onSuggestionsFetchRequested).to.have.been.calledOnce;
       expect(onSuggestionsFetchRequested).to.have.been.calledWithExactly({
@@ -163,7 +193,7 @@ describe('Autosuggest with multiSection={true}', () => {
   describe('renderSectionTitle', () => {
     beforeEach(() => {
       focusInput();
-      renderSectionTitle.reset();
+      renderSectionTitle.resetHistory();
       setInputValue('c');
     });
 
@@ -205,7 +235,7 @@ describe('Autosuggest with multiSection={true}', () => {
   describe('getSectionSuggestions', () => {
     beforeEach(() => {
       focusInput();
-      getSectionSuggestions.reset();
+      getSectionSuggestions.resetHistory();
       setInputValue('j');
     });
 

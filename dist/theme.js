@@ -1,9 +1,10 @@
-'use strict';
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var defaultTheme = (exports.defaultTheme = {
+exports.mapToAutowhateverTheme = exports.defaultTheme = void 0;
+var defaultTheme = {
   container: 'react-autosuggest__container',
   containerOpen: 'react-autosuggest__container--open',
   input: 'react-autosuggest__input',
@@ -18,11 +19,10 @@ var defaultTheme = (exports.defaultTheme = {
   sectionContainer: 'react-autosuggest__section-container',
   sectionContainerFirst: 'react-autosuggest__section-container--first',
   sectionTitle: 'react-autosuggest__section-title'
-});
+};
+exports.defaultTheme = defaultTheme;
 
-var mapToAutowhateverTheme = (exports.mapToAutowhateverTheme = function mapToAutowhateverTheme(
-  theme
-) {
+var mapToAutowhateverTheme = function mapToAutowhateverTheme(theme) {
   var result = {};
 
   for (var key in theme) {
@@ -57,4 +57,6 @@ var mapToAutowhateverTheme = (exports.mapToAutowhateverTheme = function mapToAut
   }
 
   return result;
-});
+};
+
+exports.mapToAutowhateverTheme = mapToAutowhateverTheme;
